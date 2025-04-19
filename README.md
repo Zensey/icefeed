@@ -1,18 +1,17 @@
-* Proper Timebase Conversion:
-    
-    Converts input timestamps to output stream's timebase
-    Maintains relative timing between packets
-    Preserves audio synchronization
+## icefeed: a simple source for icestream2
 
-* Running Counter (next_pts):
+### ABOUT  
 
-    Global counter that never decreases
-    Ensures no timestamp collisions between files
-    Always increments by at least 1
+This is a a simple source for icestream2.
+It created a AAC stream from local file system and feeds it to icecast2 server.
+The playlist is randomized on each play cycle.
+No transcoding is done, that's why M4A / MP4 files are only used.
+Note that the target Icecast stream should be AAC.
 
-* Audio-Specific Handling:
+### Install
 
-    Sets DTS equal to PTS (correct for audio streams)
-    Handles cases where PTS might be missing
+    `make icefeed`
 
+## Run the daemon
 
+    `./icefeed icecast://source:password@icecast2.server:8000/stream.aac ~/music`
