@@ -30,7 +30,7 @@ class ErrorWritePacket : public std::exception{};
 class IcecastStreamer
 {
     std::string icecast_url;
-    std::string dir;
+    std::string music_dir;
 
     AVFormatContext *output_ctx = nullptr;
     AVStream *audio_stream = nullptr;
@@ -46,7 +46,7 @@ class IcecastStreamer
 public:
     IcecastStreamer(const std::string &url,
                     const std::string &dir)
-        : icecast_url(url), dir(dir)
+        : icecast_url(url), music_dir(dir)
     {
         avformat_network_init();
     }
@@ -69,7 +69,7 @@ public:
     std::vector<fs::path> get_m4a_files()
     {
         std::vector<fs::path> files;
-        for (const auto &entry : fs::directory_iterator("."))
+        for (const auto &entry : fs::directory_iterator(music_dir))
         {
             if (entry.is_regular_file())
             {
