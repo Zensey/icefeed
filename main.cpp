@@ -16,11 +16,16 @@ extern "C"
 #include <libavutil/time.h>
 }
 
+
+#ifdef DEBUG
+#define DEBUG_MSG(str) do { std::cout << str << std::endl; } while( false )
+#else
+#define DEBUG_MSG(str) do { } while ( false )
+#endif
+
 namespace fs = std::filesystem;
 
-class ErrorWritePacket : public std::exception
-{
-};
+class ErrorWritePacket : public std::exception{};
 
 class IcecastStreamer
 {
@@ -35,7 +40,7 @@ class IcecastStreamer
     int64_t last_pts = 0;
     int64_t offset_pts = 0;
 
-    std::chrono::time_point<std::chrono::system_clock> t0;
+    std::chrono::time_point<std::chrono::system_clock> start_time;
     std::chrono::duration<long long, std::ratio<1, 1000000>> lag = {};
 
 public:
@@ -167,7 +172,6 @@ public:
                     int64_t sleep_us = av_rescale_q(pkt.duration, input_time_base, AV_TIME_BASE_Q);
 
                     auto diff_us = sleep_us - lag.count();
-                    // std::cout << "sleep_us: " << diff_us << "\n";
                     if (diff_us > 0)
                     {
                         std::this_thread::sleep_for(std::chrono::microseconds(diff_us));
@@ -188,13 +192,12 @@ public:
                 }
 
                 int64_t t_track_us = av_rescale_q(pkt.pts, input_time_base, AV_TIME_BASE_Q);
-                // std::cout << "pts \t" << pkt.pts << "\t t_track_us:" << t_track_us << "\t" << lag.count() << '\n';
+                DEBUG_MSG("pts \t" << pkt.pts << "\t t_track_us:" << t_track_us << "\t" << lag.count());
 
                 // Ensure we always move forward by at least 1
                 last_pts = pkt.pts + 1;
 
                 pkt.stream_index = audio_stream->index;
-                // std::cout << "audio_stream->index \t" << audio_stream->index << '\n';
 
                 if (av_interleaved_write_frame(output_ctx, &pkt) < 0)
                 {
@@ -205,8 +208,9 @@ public:
                 }
 
                 auto now = std::chrono::system_clock::now();
-                lag = std::chrono::duration_cast<std::chrono::microseconds>(now - t0 - std::chrono::microseconds(t_track_us));
-                // std::cout << "lag: \t" << lag.count() << " \t" << t_track_us << '\n';
+                lag = std::chrono::duration_cast<std::chrono::microseconds>(now - start_time - std::chrono::microseconds(t_track_us));
+                DEBUG_MSG("lag: \t" << lag.count() << " \t" << t_track_us);
+
             }
             av_packet_unref(&pkt);
         }
@@ -216,8 +220,7 @@ public:
 
     void run()
     {
-        t0 = std::chrono::system_clock::now();
-
+        start_time = std::chrono::system_clock::now();
         init_icecast_connection();
 
         while (true)
