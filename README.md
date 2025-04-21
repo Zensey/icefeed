@@ -10,8 +10,8 @@ Note that the target Icecast stream should be AAC.
 
 ### Install
 
-    `make icefeed`
+    make icefeed
 
 ## Run the daemon
 
-    `./icefeed icecast://source:password@icecast2.server:8000/stream.aac ~/music`
+    ./icefeed icecast://source:password@icecast2.server:8000/stream.aac ~/music
