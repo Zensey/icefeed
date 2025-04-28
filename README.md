@@ -1,14 +1,18 @@
-## icefeed: a simple source for icestream2
+## icefeed: a client for broadcasting M4A format to an Icestream 2 server
 
-### ABOUT  
+### ABOUT
 
-This is a a simple source for icestream2.
-It created a AAC stream from local file system and feeds it to icecast2 server.
+This is a client for broadcasting M4A format to an Icestream 2 server.
+The main goal is to create an AAC stream from a local file system and feed it to Icecast 2 server.
 The playlist is randomized on each play cycle.
-No transcoding is done, that's why M4A / MP4 files are only used.
-Note that the target Icecast stream should be AAC.
+No transcoding is done. Only M4A / MP4 files are used.
+Note that the target Icecast 2 stream should be AAC.
 
-### Install
+### Dependencies
+
+    apt install libavdevice-dev libavfilter-dev libswscale-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev
+    
+### Build
 
     make icefeed
 
